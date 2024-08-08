@@ -6,6 +6,7 @@ mainmodule reductiontest
     {
         entry Main(CkArgMsg* m);
         entry [reductiontarget, expedited] void reduce();
+        entry [reductiontarget] void end(long counts);
     };
     array [1D] ReduceChares
     {
@@ -13,5 +14,6 @@ mainmodule reductiontest
         entry void self_computation();
         entry void contribute_reduction();
         entry void broadcast();
+        entry void contribute_comp_counts();
     };
 };
