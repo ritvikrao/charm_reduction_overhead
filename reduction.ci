@@ -1,0 +1,17 @@
+mainmodule reductiontest
+{
+    readonly CProxy_Main mainProxy;
+    readonly CProxy_ReduceChares arr;
+    mainchare Main
+    {
+        entry Main(CkArgMsg* m);
+        entry [reductiontarget, expedited] void reduce();
+    };
+    array [1D] ReduceChares
+    {
+        entry ReduceChares();
+        entry void self_computation();
+        entry void contribute_reduction();
+        entry void broadcast();
+    };
+};
