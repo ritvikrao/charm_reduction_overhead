@@ -23,6 +23,7 @@ class Main : public CBase_Main
     std::vector<double> reduction_times;
     double last_time;
     double begin_time;
+    long reduction_count = 0;
 
     public:
     Main(CkArgMsg *m)
@@ -30,31 +31,30 @@ class Main : public CBase_Main
         mainProxy = thisProxy;
         arr = CProxy_ReduceChares::ckNew(CkNumPes());
         last_time = CkWallTimer() + (0.1/1000);
-        //CcdCallFnAfter(start_reductions, (void *) this, 0.1);
+        CcdCallFnAfter(start_reductions, (void *) this, 0.1);
         CcdCallFnAfter(end_time, (void *) this, 5000.0);
         begin_time = CkWallTimer();
         arr.self_computation();
     }
     void reduce()
     {
+        reduction_count++;
         double current_time = CkWallTimer();
         reduction_times.push_back(current_time-last_time);
         last_time = current_time;
-        if(reduction_times.size()<100) arr.broadcast();
-        else
-        {
-            double time_sum = 0.0;
-            for(int i=0; i<reduction_times.size(); i++)
-            {
-                time_sum += reduction_times[i];
-            }
-            ckout << "Average reduction time: " << time_sum / 100.0 << endl;
-            arr.contribute_comp_counts();
-        }
+        arr.broadcast();
     }
     void end(long counts)
     {
         double time_elapsed = CkWallTimer() - begin_time;
+        double time_sum = 0.0;
+        for(int i=0; i<reduction_times.size(); i++)
+        {
+            time_sum += reduction_times[i];
+        }
+        ckout << "Number of reductions: " << reduction_count << endl;
+        ckout << "Time elapsed: " << time_elapsed << endl;
+        ckout << "Average time between reductions: " << time_sum / 100.0 << endl;
         ckout << "Computations per second: " << counts / time_elapsed << endl;
         ckout << "Seconds per computation: " << time_elapsed / counts << endl;
         CkExit(0);
@@ -65,6 +65,7 @@ class ReduceChares : public CBase_ReduceChares
 {
     private:
     long comp_counts = 0;
+    double reduction_contribution_time = 0.0;
 
     public:
     ReduceChares(){

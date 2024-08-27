@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH -N 16
+#SBATCH -N 1
 #SBATCH --ntasks-per-node=8
 #SBATCH --cpus-per-task=7
-#SBATCH --output=reduction_16.out
+#SBATCH --output=reduction_1.out
 #SBATCH -A bip249
 #SBATCH --job-name=reduction
 #SBATCH --exclusive
@@ -10,4 +10,4 @@
 
 export PPN=6
 # single node: --network=single_node_vni
-srun ./reductiontest +ppn $PPN +setcpuaffinity
+srun --network=single_node_vni ./reductiontest +ppn $PPN +setcpuaffinity
